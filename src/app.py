@@ -8,6 +8,7 @@ from PIL import Image
 import pickle
 from utils.preprocessing import clean_resume
 from utils.textextraction import convert_file_to_text 
+from utils.config import category_mapping
 
 #loading models
 clf = pickle.load(open('Models/clf.pkl','rb'))
@@ -33,14 +34,14 @@ def extract():
         resume_text = convert_file_to_text(resume_file_path)  
         clean_text = clean_resume(resume_text)
         prediction = predict_result(clean_text)
-        print(prediction)
              
-    return render_template("index.html", title=title)  # Redirect to the home page
+    return render_template('prediction.html', status = 200, result = prediction, title=title)  # Redirect to the home page
     # return render_template('index.html', status=500, res = "Internal Server Error ")
 
 def predict_result(text):
     input_features = tf.transform([text])
-    return clf.predict(input_features)[0]
+    prediction_id = clf.predict(input_features)[0]
+    return category_mapping[prediction_id]
 
 if __name__ == "__main__":
     app.run(debug =True)
